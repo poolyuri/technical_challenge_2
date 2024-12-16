@@ -1,0 +1,42 @@
+org: pampero
+app: technical-challenge
+service: technical-challenge
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-west-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-west-2:194722424694:table/ExampleTable
+
+functions:
+  createExample:
+    handler: src/serverless/addExample.addExample
+    events:
+      - httpApi:
+          path: /examples
+          method: post
+  getExample:
+    handler: src/serverless/getExamples.getExamples
+    events:
+      - httpApi:
+          path: /examples
+          method: get
+
+resources:
+  Resources:
+    ExampleTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ExampleTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
